@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BaseLab – Number Systems Made Simple</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f2ff;--bg2:#e9e5ff;--card:rgba(255,255,255,.75);--ink:#1b1740;--mute:#5d5a85;--line:rgba(60,40,160,.15);--a:#6a4cff;--b:#e8890c;--glow:rgba(106,76,255,.35);--ok:#0a8f6a;--bad:#d1334a;color-scheme:light;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d0b22;--bg2:#17133a;--card:rgba(30,25,75,.6);--ink:#ece9ff;--mute:#a49fd6;--line:rgba(150,130,255,.2);--a:#9a85ff;--b:#ffb347;--glow:rgba(154,133,255,.45);--ok:#4be3b4;--bad:#ff6b82;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d0b22;--bg2:#17133a;--card:rgba(30,25,75,.6);--ink:#ece9ff;--mute:#a49fd6;--line:rgba(150,130,255,.2);--a:#9a85ff;--b:#ffb347;--glow:rgba(154,133,255,.45);--ok:#4be3b4;--bad:#ff6b82;color-scheme:dark}
+html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 'Space Grotesk',system-ui,sans-serif;min-height:100vh;overflow-x:hidden;transition:background .5s,color .5s}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:60}
+body::after{content:"";position:fixed;inset:0;background:radial-gradient(900px 500px at 15% -10%,var(--bg2),transparent),radial-gradient(700px 400px at 100% 100%,var(--bg2),transparent);z-index:-2}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+#bits{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+#bits span{position:absolute;bottom:-40px;font:600 18px 'JetBrains Mono',monospace;color:var(--a);opacity:.16;animation:rise linear infinite}
+@keyframes rise{to{transform:translateY(-115vh)}}
+/* cursor */
+@media (hover:hover) and (pointer:fine){body,button,select,input,a{cursor:none}}
+#dot,#ring,#aura{position:fixed;top:0;left:0;pointer-events:none;z-index:100;border-radius:50%;display:none}
+@media (hover:hover) and (pointer:fine){#dot,#ring,#aura{display:block}}
+#dot{width:8px;height:8px;margin:-4px;background:var(--b)}
+#ring{width:34px;height:34px;margin:-17px;border:1.5px solid var(--a);transition:width .25s,height .25s,margin .25s,background .25s}
+#ring.big{width:60px;height:60px;margin:-30px;background:var(--glow)}
+#aura{width:420px;height:420px;margin:-210px;background:radial-gradient(circle,var(--glow),transparent 65%);z-index:0;opacity:.7;mix-blend-mode:normal}
+/* nav */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;display:flex;align-items:center;gap:12px;padding:12px 5vw;backdrop-filter:blur(14px);background:color-mix(in srgb,var(--bg) 70%,transparent);border-bottom:1px solid var(--line)}
+.logo{font-weight:700;font-size:1.3rem;margin-right:auto;display:flex;gap:8px;align-items:center}
+.logo i{font:600 .8rem 'JetBrains Mono';background:linear-gradient(135deg,var(--a),var(--b));color:#fff;padding:3px 7px;border-radius:8px;font-style:normal}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav button,.icon{background:none;border:0;color:var(--mute);font:600 .95rem 'Space Grotesk';padding:8px 14px;border-radius:999px;transition:.3s}
+nav button:hover,.icon:hover{color:var(--ink);background:var(--glow)}
+nav button.on{color:#fff;background:var(--a)}
+.icon{border:1px solid var(--line);font-size:1.1rem;padding:6px 12px}
+/* pages */
+main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:30px 5vw 80px}
+.page{display:none}.page.on{display:block;animation:pin .6s cubic-bezier(.2,.8,.2,1)}
+.page.out{display:block;animation:pout .3s ease forwards}
+@keyframes pin{from{opacity:0;transform:translateY(24px) scale(.985);filter:blur(6px)}}
+@keyframes pout{to{opacity:0;transform:translateY(-14px);filter:blur(4px)}}
+h1{font-size:clamp(2.2rem,6vw,4.2rem);line-height:1.05;margin:.3em 0;letter-spacing:-.03em}
+h2{font-size:clamp(1.5rem,3.4vw,2.2rem);margin:0 0 .4em;letter-spacing:-.02em}
+.grad{background:linear-gradient(100deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.type{font:600 1.3rem 'JetBrains Mono';color:var(--b);min-height:2em}
+.type::after{content:"▌";animation:blink 1s steps(1) infinite;margin-left:2px}
+@keyframes blink{50%{opacity:0}}
+.lead{color:var(--mute);max-width:60ch}
+.btn{border:0;border-radius:14px;padding:13px 24px;font:600 1rem 'Space Grotesk';color:#fff;background:linear-gradient(120deg,var(--a),#b04cff);transition:transform .3s,box-shadow .3s;box-shadow:0 6px 20px -6px var(--glow)}
+.btn:hover{transform:translateY(-3px);box-shadow:0 14px 30px -8px var(--glow)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line);box-shadow:none}
+.btn.ghost:hover{border-color:var(--a)}
+.btn:disabled{opacity:.4;pointer-events:none}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;margin-top:28px}
+.card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;backdrop-filter:blur(10px);transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s,border-color .35s;transform-style:preserve-3d;overflow:hidden}
+.card::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),var(--a),transparent 60%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .35s;pointer-events:none}
+.card:hover{box-shadow:0 24px 50px -20px var(--glow)}
+.card:hover::before{opacity:1}
+.card h3{margin:.2em 0}
+.card p{color:var(--mute);margin:0}
+.big-ico{font:700 2rem 'JetBrains Mono';color:var(--a)}
+.rv{opacity:0;transform:translateY(34px);transition:opacity .8s,transform .8s cubic-bezier(.2,.8,.2,1)}
+.rv.in{opacity:1;transform:none}
+/* inputs */
+label{font-weight:600;font-size:.9rem;color:var(--mute)}
+input,select{background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-radius:14px;padding:13px 16px;font:600 1.15rem 'JetBrains Mono';width:100%;outline:0;transition:.3s}
+input:focus,select:focus,button:focus-visible{border-color:var(--a);box-shadow:0 0 0 4px var(--glow);outline:0}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 16px}
+.chip{border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:7px 16px;font:600 .9rem 'Space Grotesk';transition:.3s}
+.chip:hover{transform:translateY(-2px);border-color:var(--a)}
+.chip.on{background:var(--a);color:#fff;border-color:var(--a)}
+.res{font:600 1.35rem 'JetBrains Mono';word-break:break-all;color:var(--ink);margin-top:6px}
+.res small{display:block;font:600 .8rem 'Space Grotesk';color:var(--mute)}
+.err{color:var(--bad);min-height:1.5em;font-weight:600}
+ol.steps{list-style:none;counter-reset:s;margin:16px 0 0;padding:0}
+ol.steps li{counter-increment:s;position:relative;padding:10px 14px 10px 52px;margin:8px 0;border-left:3px solid var(--a);background:var(--card);border-radius:0 14px 14px 0;font-family:'JetBrains Mono',monospace;font-size:.95rem;animation:pin .5s both}
+ol.steps li::before{content:counter(s);position:absolute;left:12px;top:9px;width:26px;height:26px;border-radius:50%;background:var(--a);color:#fff;display:grid;place-items:center;font:600 .8rem 'Space Grotesk'}
+ol.steps li.final{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.prog{height:6px;border-radius:9px;background:var(--line);overflow:hidden;margin:14px 0}
+.prog div{height:100%;width:0;background:linear-gradient(90deg,var(--a),var(--b));transition:width .5s}
+pre{font:600 1.1rem/1.5 'JetBrains Mono',monospace;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;overflow-x:auto;margin:14px 0 0}
+.si{color:var(--b);font-size:.9rem}
+/* modal */
+#modal{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:20px;background:rgba(10,8,30,.6);backdrop-filter:blur(8px);animation:fade .5s}
+#modal.hide{animation:fadeout .4s forwards}
+@keyframes fade{from{opacity:0}}@keyframes fadeout{to{opacity:0;visibility:hidden}}
+#modal .card{max-width:440px;text-align:center;padding:34px;animation:pop .6s cubic-bezier(.2,1.3,.3,1);background:var(--bg)}
+@keyframes pop{from{transform:scale(.8) translateY(30px);opacity:0}}
+#modal .emoji{font-size:3rem;display:block;animation:bob 2s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-8px)}}
+footer{text-align:center;color:var(--mute);padding:30px;font-size:.9rem;position:relative;z-index:1}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div id="aura"></div><div id="ring"></div><div id="dot"></div><div id="bits"></div>
+
+<div id="modal"><div class="card tilt">
+  <span class="emoji">👋</span>
+  <h2>Are you a beginner?</h2>
+  <p>Choose “Yes” and we’ll teach you step by step. Choose “No” and jump straight to the converter.</p>
+  <div class="row" style="justify-content:center;margin-top:22px">
+    <button class="btn" id="yes">Yes, guide me</button>
+    <button class="btn ghost" id="no">No, take me in</button>
+  </div>
+</div></div>
+
+<header>
+  <div class="logo"><i>101</i> BaseLab</div>
+  <nav>
+    <button data-p="home" class="on">Home</button>
+    <button data-p="convert">Convert</button>
+    <button data-p="learn">Learn</button>
+    <button data-p="math">Binary Math</button>
+  </nav>
+  <button class="icon" id="theme" aria-label="Switch theme">🌙</button>
+</header>
+
+<main>
+<section class="page on" id="home">
+  <h1>Every number has<br><span class="grad">more than one face.</span></h1>
+  <div class="type" id="type"></div>
+  <p class="lead">Convert between Decimal, Binary, Octal and Hexadecimal, watch every working step, and learn the method from scratch.</p>
+  <div class="row" style="margin-top:20px"><button class="btn" data-go="convert">Open converter</button><button class="btn ghost" data-go="learn">Learn step by step</button></div>
+  <div class="grid">
+    <div class="card tilt rv" data-go="convert"><div class="big-ico">10↔2</div><h3>Live converter</h3><p>Type once, see all four systems and the full working.</p></div>
+    <div class="card tilt rv" data-go="learn"><div class="big-ico">1→7</div><h3>Guided lessons</h3><p>Seven short lessons. Tap “Next” to reveal one step at a time.</p></div>
+    <div class="card tilt rv" data-go="math"><div class="big-ico">1+1</div><h3>Binary arithmetic</h3><p>Add and subtract with carries and borrows shown.</p></div>
+    <div class="card tilt rv" data-go="learn"><div class="big-ico">3·4</div><h3>Bit grouping</h3><p>Jump between binary, octal and hex using 3-bit and 4-bit groups.</p></div>
+  </div>
+</section>
+
+<section class="page" id="convert">
+  <h2>Number system converter</h2>
+  <p class="lead">Choose the system your number is in, type it, and every other system updates instantly.</p>
+  <div class="card rv" style="margin-top:20px">
+    <label>Your number is in</label>
+    <div class="chips" id="fromChips"></div>
+    <input id="inp" placeholder="e.g. 1101" autocomplete="off" spellcheck="false">
+    <div class="err" id="err"></div>
+  </div>
+  <div class="grid" id="results"></div>
+  <div class="card rv" style="margin-top:22px">
+    <h3>Show the working: convert to</h3>
+    <div class="chips" id="toChips"></div>
+    <ol class="steps" id="work"></ol>
+  </div>
+</section>
+
+<section class="page" id="learn">
+  <h2>Learn step by step</h2>
+  <p class="lead">Pick a lesson, then press Next to reveal each step.</p>
+  <div class="chips" id="lessonChips" style="margin-top:18px"></div>
+  <div class="card">
+    <h3 id="lTitle"></h3><p id="lIntro"></p>
+    <div class="prog"><div id="lProg"></div></div>
+    <ol class="steps" id="lSteps"></ol>
+    <div class="row" style="margin-top:18px">
+      <button class="btn" id="next">Next step</button>
+      <button class="btn ghost" id="reset">Restart</button>
+      <button class="btn ghost" data-go="convert">Try it yourself</button>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="math">
+  <h2>Binary arithmetic</h2>
+  <p class="lead">Enter two binary numbers and see the carries (or borrows) column by column.</p>
+  <div class="card" style="margin-top:20px">
+    <div class="row">
+      <div style="flex:1;min-width:130px"><label>First number</label><input id="ma" value="101" inputmode="numeric"></div>
+      <div style="width:110px"><label>Operation</label><select id="mo"><option value="+">+</option><option value="-">−</option></select></div>
+      <div style="flex:1;min-width:130px"><label>Second number</label><input id="mb" value="11" inputmode="numeric"></div>
+    </div>
+    <div class="err" id="merr"></div>
+    <pre id="mout"></pre>
+    <p class="mono si" id="mdec"></p>
+  </div>
+</section>
+</main>
+<footer>BaseLab · built for learning number systems</footer>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const NAMES={2:'Binary',8:'Octal',10:'Decimal',16:'Hexadecimal'},DIG='0123456789ABCDEF',SUP='⁰¹²³⁴⁵⁶⁷⁸⁹';
+const sup=n=>String(n).split('').map(c=>SUP[c]).join('');
+const sub=(s,b)=>s+String(b).split('').map(c=>'₀₁₂₃₄₅₆₇₈₉'[c]).join('');
+/* theme */
+const root=document.documentElement;
+function setTheme(t){root.dataset.theme=t;$('#theme').textContent=t==='dark'?'☀️':'🌙';try{localStorage.setItem('bl-theme',t)}catch(e){}}
+let st=null;try{st=localStorage.getItem('bl-theme')}catch(e){}
+setTheme(st||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'));
+$('#theme').onclick=()=>setTheme(root.dataset.theme==='dark'?'light':'dark');
+/* floating bits */
+for(let i=0;i<26;i++){const s=document.createElement('span');s.textContent=['0','1','A','F','7','1'][i%6];s.style.left=Math.random()*100+'%';s.style.animationDuration=14+Math.random()*20+'s';s.style.animationDelay=-Math.random()*30+'s';s.style.fontSize=12+Math.random()*20+'px';$('#bits').appendChild(s)}
+/* cursor */
+let mx=innerWidth/2,my=innerHeight/2,rx=mx,ry=my,ax=mx,ay=my;
+addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;$('#dot').style.transform=`translate(${mx}px,${my}px)`});
+(function loop(){rx+=(mx-rx)*.18;ry+=(my-ry)*.18;ax+=(mx-ax)*.07;ay+=(my-ay)*.07;$('#ring').style.transform=`translate(${rx}px,${ry}px)`;$('#aura').style.transform=`translate(${ax}px,${ay}px)`;requestAnimationFrame(loop)})();
+document.addEventListener('mouseover',e=>$('#ring').classList.toggle('big',!!e.target.closest('button,.card[data-go],input,select,a')));
+/* tilt + border glow */
+document.addEventListener('mousemove',e=>{const c=e.target.closest('.card');if(!c)return;const r=c.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;c.style.setProperty('--mx',x+'px');c.style.setProperty('--my',y+'px');
+ if(c.classList.contains('tilt'))c.style.transform=`perspective(800px) rotateX(${(.5-y/r.height)*10}deg) rotateY(${(x/r.width-.5)*10}deg) translateY(-8px)`});
+document.addEventListener('mouseout',e=>{const c=e.target.closest&&e.target.closest('.card.tilt');if(c&&!c.contains(e.relatedTarget))c.style.transform=''});
+/* scroll reveal */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+const reveal=()=>$$('.rv:not(.in)').forEach(el=>io.observe(el));
+/* pages */
+let cur='home',busy=false;
+function show(p){if(p===cur||busy)return;busy=true;const a=$('#'+cur),b=$('#'+p);a.classList.add('out');
+ setTimeout(()=>{a.classList.remove('on','out');b.classList.add('on');cur=p;busy=false;$$('nav button').forEach(x=>x.classList.toggle('on',x.dataset.p===p));scrollTo({top:0,behavior:'smooth'});reveal()},300)}
+$$('nav button').forEach(b=>b.onclick=()=>show(b.dataset.p));
+document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)show(g.dataset.go)});
+/* modal */
+const closeModal=p=>{$('#modal').classList.add('hide');setTimeout(()=>$('#modal').remove(),400);show(p)};
+$('#yes').onclick=()=>closeModal('learn');$('#no').onclick=()=>closeModal('convert');
+/* typing */
+const words=['Decimal → Binary in 4 steps','Binary → Hex with 4-bit groups','Octal needs just 3 bits','Two’s complement is coming soon'];
+let wi=0,ci=0,del=false;
+(function tick(){const w=words[wi];$('#type').textContent=w.slice(0,ci);if(!del&&ci===w.length){del=true;return setTimeout(tick,1500)}
+ if(del&&ci===0){del=false;wi=(wi+1)%words.length}ci+=del?-1:1;setTimeout(tick,del?28:70)})();
+/* converter */
+const parse=(s,b)=>{s=s.trim().toUpperCase();if(!s)return null;let n=0n;for(const c of s){const d=DIG.indexOf(c);if(d<0||d>=b)return false;n=n*BigInt(b)+BigInt(d)}return n};
+const toB=(n,b)=>n.toString(b).toUpperCase();
+function divSteps(n,b){const o=[];let q=n,rem=[];if(q===0n)return{o:['0 ÷ '+b+' = 0 (remainder 0)'],r:'0'};
+ while(q>0n){const r=Number(q%BigInt(b)),nq=q/BigInt(b);o.push(`${q} ÷ ${b} = ${nq} (remainder ${r}${r>9?' = '+DIG[r]:''})`);rem.push(DIG[r]);q=nq}return{o,r:rem.reverse().join('')}}
+function posSteps(s,b){s=s.toUpperCase();const L=s.length,t=[],v=[];let tot=0n;
+ [...s].forEach((c,i)=>{const d=DIG.indexOf(c),p=L-1-i,val=BigInt(d)*BigInt(b)**BigInt(p);t.push(`(${d} × ${b}${sup(p)})`);v.push(val);tot+=val});
+ return{o:['Multiply each digit by its place value: '+t.join(' + '),'Work out each term: '+v.join(' + '),'Add them up: '+tot],r:String(tot)}}
+function steps(from,to,s,n){const o=[],k={2:1,8:3,16:4};
+ if(from===to)return[`Already in ${NAMES[to]}: ${s.toUpperCase()}`];
+ if(from===2&&(to===8||to===16)){const g=to===8?3:4;let p=s.padStart(Math.ceil(s.length/g)*g,'0');const ch=p.match(new RegExp('.{'+g+'}','g'));
+  o.push(`Group the bits in ${g}s from the right (pad with zeros): ${ch.join(' ')}`);o.push('Convert each group: '+ch.map(c=>`${c}→${DIG[parseInt(c,2)]}`).join('  '));o.push(`Answer: ${sub(toB(n,to),to)}`);return o}
+ if((from===8||from===16)&&to===2){const g=from===8?3:4;o.push('Write each digit as '+g+' bits: '+[...s.toUpperCase()].map(c=>`${c}→${DIG.indexOf(c).toString(2).padStart(g,'0')}`).join('  '));o.push(`Join them (drop leading zeros): ${sub(toB(n,2),2)}`);return o}
+ if(from!==10){const p=posSteps(s,from);o.push(...p.o.map(x=>x));o.push(`${sub(s.toUpperCase(),from)} = ${sub(p.r,10)}`)}
+ if(to!==10){const d=divSteps(n,to);o.push(`Now divide ${n} by ${to} again and again:`);o.push(...d.o);o.push(`Read the remainders from bottom to top: ${sub(d.r,to)}`)}
+ return o}
+function list(el,arr){el.innerHTML='';arr.forEach((t,i)=>{const li=document.createElement('li');li.innerHTML=t;li.style.animationDelay=i*90+'ms';if(i===arr.length-1)li.className='final';el.appendChild(li)})}
+let from=2,to=10;
+function chips(id,get,set){const c=$(id);c.innerHTML='';[2,8,10,16].forEach(b=>{const x=document.createElement('button');x.className='chip'+(get()===b?' on':'');x.textContent=NAMES[b];x.onclick=()=>{set(b);render()};c.appendChild(x)})}
+function render(){chips('#fromChips',()=>from,b=>from=b);chips('#toChips',()=>to,b=>to=b);
+ const s=$('#inp').value,n=parse(s,from);$('#err').textContent=n===false?`“${s}” is not a valid ${NAMES[from]} number. Allowed digits: ${DIG.slice(0,from)}`:'';
+ const R=$('#results');R.innerHTML='';
+ if(typeof n!=='bigint'){$('#work').innerHTML='';return}
+ [2,8,10,16].forEach(b=>{const d=document.createElement('div');d.className='card tilt';d.innerHTML=`<small class="mono si">base ${b}</small><h3>${NAMES[b]}</h3><div class="res">${toB(n,b)}</div>`;R.appendChild(d)});
+ list($('#work'),steps(from,to,s,n))}
+$('#inp').addEventListener('input',render);render();
+/* lessons */
+const L=[
+['What are number systems?','Four systems matter in computing. Each has a base: how many digits it uses.',['Decimal (base 10) uses digits 0–9.','Binary (base 2) uses only 0 and 1 – the language of computers.','Octal (base 8) uses digits 0–7.','Hexadecimal (base 16) uses 0–9 and A–F, where A=10, B=11, C=12, D=13, E=14, F=15.']],
+['Decimal → Binary','Example: convert 13₁₀ to binary. Divide by 2 and keep the remainders.',['13 ÷ 2 = 6 (remainder 1)','6 ÷ 2 = 3 (remainder 0)','3 ÷ 2 = 1 (remainder 1)','1 ÷ 2 = 0 (remainder 1)','Read remainders bottom to top: <b>1101₂</b>']],
+['Decimal → Octal','Example: convert 65₁₀ to octal. Divide by 8.',['65 ÷ 8 = 8 (remainder 1)','8 ÷ 8 = 1 (remainder 0)','1 ÷ 8 = 0 (remainder 1)','Bottom to top: <b>101₈</b>']],
+['Decimal → Hexadecimal','Example: convert 42₁₀ to hex. Divide by 16 and turn remainders 10–15 into A–F.',['42 ÷ 16 = 2 (remainder 10 = A)','2 ÷ 16 = 0 (remainder 2)','Bottom to top: <b>2A₁₆</b>']],
+['Any system → Decimal','Multiply each digit by its place value, then add. Example: 1101₂.',['Place values from the right: 2⁰, 2¹, 2², 2³','(1 × 2³) + (1 × 2²) + (0 × 2¹) + (1 × 2⁰)','8 + 4 + 0 + 1 = <b>13₁₀</b>','Same idea for hex: 2A₁₆ = (2 × 16) + (10 × 1) = <b>42₁₀</b>']],
+['Grouping bits','Binary ↔ octal ↔ hex without any division. Octal uses 3 bits per digit, hex uses 4.',['Binary → Octal: 110101₂ → (110)(101) → <b>65₈</b>','Octal → Binary: 72₈ → 7=111, 2=010 → <b>111010₂</b>','Binary → Hex: 10111010₂ → (1011)(1010) → B, A → <b>BA₁₆</b>','Hex → Binary: 3F₁₆ → 3=0011, F=1111 → <b>00111111₂</b>','Octal ↔ Hex: go through binary first.']],
+['Binary addition & subtraction','Four rules for adding: 0+0=0, 0+1=1, 1+0=1, 1+1=10 (write 0, carry 1).',['Add 101₂ + 11₂, starting from the right.','1 + 1 = 10 → write 0, carry 1','0 + 1 + carry 1 = 10 → write 0, carry 1','1 + carry 1 = 10 → write 0, carry 1, then write the last 1','Answer: <b>1000₂</b>','Subtraction: 0 − 1 borrows from the left, turning 0 into 10₂ (2) so 2 − 1 = 1. Try it on the Binary Math page.']]];
+let li=0,shown=0;
+function lessons(){const c=$('#lessonChips');c.innerHTML='';L.forEach((l,i)=>{const x=document.createElement('button');x.className='chip'+(i===li?' on':'');x.textContent=(i+1)+'. '+l[0];x.onclick=()=>{li=i;shown=0;lessons()};c.appendChild(x)});
+ const [t,intro,st]=L[li];$('#lTitle').textContent=t;$('#lIntro').textContent=intro;list($('#lSteps'),st.slice(0,shown));
+ $('#lProg').style.width=shown/st.length*100+'%';const n=$('#next');n.disabled=false;n.textContent=shown>=st.length?(li<L.length-1?'Next lesson':'Finished 🎉'):shown?'Next step':'Start';if(li===L.length-1&&shown>=st.length)n.disabled=true}
+$('#next').onclick=()=>{if(shown>=L[li][2].length){li++;shown=0}else shown++;lessons()};
+$('#reset').onclick=()=>{shown=0;lessons()};lessons();
+/* binary math */
+function math(){const a=$('#ma').value.trim(),b=$('#mb').value.trim(),op=$('#mo').value,e=$('#merr');
+ if(!/^[01]+$/.test(a)||!/^[01]+$/.test(b)){e.textContent='Use only 0 and 1 in both boxes.';$('#mout').textContent='';$('#mdec').textContent='';return}e.textContent='';
+ const A=parseInt(a,2),B=parseInt(b,2),w=Math.max(a.length,b.length)+2,p=s=>s.padStart(w,' ').split('').join(' ');
+ let r=op==='+'?A+B:A-B,rs=(r<0?'-':'')+Math.abs(r).toString(2),car='';
+ if(op==='+'){const x=a.padStart(w,'0'),y=b.padStart(w,'0');let c=0,cs=Array(w).fill(' ');for(let i=w-1;i>=0;i--){const t=+x[i]+ +y[i]+c;c=t>1?1:0;if(i>0&&c)cs[i-1]='1'}car=cs.join(' ')+'   carry\n'}
+ $('#mout').textContent=car+p(a)+'\n'+p(op==='+'?'+':'−')+'\n'+p(b)+'\n'+'-'.repeat(w*2-1)+'\n'+p(rs)+(r<0?'   (negative: second number is bigger)':'');
+ $('#mdec').textContent=`Check in decimal: ${A} ${op==='+'?'+':'−'} ${B} = ${r}`}
+['#ma','#mb'].forEach(i=>$(i).addEventListener('input',math));$('#mo').onchange=math;math();
+reveal();
+</script>
+</body>
+</html>
